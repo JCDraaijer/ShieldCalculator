@@ -25,5 +25,6 @@ int boosterEquals(struct ShieldBooster, struct ShieldBooster);
 
 void freeBooster(struct ShieldBooster *);
 
+struct List *readBoosterList(char *);
 
 #endif //SHIELDCALCULATOR_SHIELDBOOSTER_H

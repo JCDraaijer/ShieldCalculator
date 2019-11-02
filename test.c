@@ -71,10 +71,10 @@ struct TestResult *findBestResultGen(struct List *generators, struct List *loadO
         struct TestResult *result = calculateTestResult(get(generators, i), loadOut, config);
         printTestResult(result);
         if (best->survivalTime < result->survivalTime) {
-            free(best);
+            freeResult(best);
             best = result;
         } else {
-            free(result);
+            freeResult(result);
         }
     }
 
@@ -82,21 +82,42 @@ struct TestResult *findBestResultGen(struct List *generators, struct List *loadO
 }
 
 struct TestResult *
-findBestResult(struct ShieldGenerator *generator, struct List *loadOutList, struct TestConfig config) {
+findBestResultBooster(struct ShieldGenerator *generator, struct List *loadOutList, struct TestConfig config) {
     struct TestResult *best = malloc(sizeof(struct TestResult));
     best->survivalTime = 0;
+    best->loadOutStats = NULL;
     for (int i = 0; i < loadOutList->length; i++) {
         struct TestResult *result = calculateTestResult(generator, get(loadOutList, i), config);
         if (best->survivalTime < result->survivalTime) {
+            freeResult(best);
             best = result;
         } else {
-            free(result);
+            freeResult(result);
         }
     }
 
     return best;
 }
 
+struct TestResult *findBestResult(struct List *generators, struct List *boosterLists, struct TestConfig config) {
+    struct TestResult *best = malloc(sizeof(struct TestResult));
+    best->survivalTime = 0;
+    best->loadOutStats = NULL;
+    for (int g = 0; g < generators->length; g++) {
+        struct ShieldGenerator *generator = get(generators, g);
+        for (int b = 0; b < boosterLists->length; b++) {
+            struct List *loadOut = get(boosterLists, b);
+            struct TestResult *result = calculateTestResult(generator, loadOut, config);
+            if (best->survivalTime < result->survivalTime) {
+                freeResult(best);
+                best = result;
+            } else {
+                freeResult(result);
+            }
+        }
+    }
+    return best;
+}
 
 void printTestResult(struct TestResult *result) {
     printf("Survival time: [%.02lf s]\n", result->survivalTime);
@@ -105,7 +126,21 @@ void printTestResult(struct TestResult *result) {
     printBoosterList(result->loadOutStats->boosters);
     printf("Shield hitpoints: [%.02lf]\n", result->loadOutStats->hitPoints);
     printf("Shield regen: [%.02lf hp/s]\n", result->loadOutStats->regenRate);
-    printf("\tExplosion resistance: [%.02lf%%]\n", result->loadOutStats->explosiveResistance * 100);
-    printf("\tKinetic Resistance: [%0.02lf%%]\n", result->loadOutStats->kineticResistance * 100);
-    printf("\tThermal Resistance: [%0.02lf%%]\n", result->loadOutStats->thermalResistance * 100);
+    printf("Explosion resistance: [%.02lf%%]\n", result->loadOutStats->explosiveResistance * 100);
+    printf("  Kinetic Resistance: [%0.02lf%%]\n", result->loadOutStats->kineticResistance * 100);
+    printf("  Thermal Resistance: [%0.02lf%%]\n", result->loadOutStats->thermalResistance * 100);
+}
+
+void printTestConfig(struct TestConfig *config) {
+    printf("Test case:\n");
+    printf("Explosive DPS: [%.02lf]\n", config->explosiveDPS);
+    printf("Kinetic DPS: [%.02lf]\n", config->kineticDPS);
+    printf("Thermal DPS: [%.02lf]\n", config->thermalDPS);
+    printf("Absolute DPS: [%.02lf]\n", config->absoluteDPS);
+    printf("Damage effectiveness: [%.01lf%%]\n", config->damageEffectiveness * 100);
+}
+
+void freeResult(struct TestResult *result) {
+    free(result->loadOutStats);
+    free(result);
 }

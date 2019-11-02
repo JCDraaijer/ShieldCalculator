@@ -30,13 +30,20 @@ struct TestResult {
 struct LoadOutStats *calculateLoadOutStats(struct ShieldGenerator *, struct List *);
 
 struct TestResult *
-findBestResult(struct ShieldGenerator *, struct List *, struct TestConfig);
+calculateTestResult(struct ShieldGenerator *, struct List *, struct TestConfig);
+
+struct TestResult *
+findBestResultBooster(struct ShieldGenerator *, struct List *, struct TestConfig);
 
 struct TestResult
 *findBestResultGen(struct List *, struct List *, struct TestConfig);
 
-struct TestResult *
-calculateTestResult(struct ShieldGenerator *, struct List *, struct TestConfig);
+struct TestResult
+*findBestResult(struct List *, struct List *, struct TestConfig);
 
-void printTestResult(struct TestResult*);
+void printTestResult(struct TestResult *);
+
+void freeResult(struct TestResult *);
+
+void printTestConfig(struct TestConfig *);
 #endif //SHIELDCALCULATOR_TEST_H

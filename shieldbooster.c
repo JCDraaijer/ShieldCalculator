@@ -63,8 +63,11 @@ struct List *generateLoadOutList(struct List *availableList, int max, int added,
                         add(loadOut, booster);
                     }
                     add(loadOutList, loadOut);
+                } else {
+                    freeList(loadOut);
                 }
             }
+            freeList(otherList);
         }
     }
     return loadOutList;
@@ -81,6 +84,25 @@ struct List *generateLoadOuts(struct List *shieldBoosterList, int max) {
         freeList(smallerList);
     }
     return list;
+}
+
+struct List *readBoosterList(char *file) {
+    FILE *fdBooster;
+    fdBooster = fopen(file, "r");
+
+    if (!fdBooster) {
+        return NULL;
+    }
+
+    struct List *boosterList = newList(START_SIZE);
+    char *line = malloc(sizeof(char) * 1024);
+    size_t size = 1024;
+    while (getline(&line, &size, fdBooster) != -1) {
+        struct ShieldBooster *booster = shieldBoosterFromString(line);
+        add(boosterList, booster);
+    }
+    free(line);
+    return boosterList;
 }
 
 void printBoosterList(struct List *boosterList) {

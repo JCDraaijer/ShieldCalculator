@@ -19,4 +19,8 @@ struct ShieldGenerator *generatorFromString(char *);
 
 void printGenerator(struct ShieldGenerator *);
 
+void freeGenerator(struct ShieldGenerator *);
+
+struct List *readGeneratorList(char *);
+
 #endif //SHIELDCALCULATOR_SHIELDGENERATOR_H

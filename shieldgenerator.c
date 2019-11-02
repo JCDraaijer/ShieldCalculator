@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "shieldgenerator.h"
+#include "list.h"
 
 struct ShieldGenerator *generatorFromString(char *value) {
     char *idStr = malloc(sizeof(char) * 64);
@@ -55,5 +56,30 @@ void printGenerator(struct ShieldGenerator *generator) {
     printf("Explosion resistance: %lf\n", generator->explosionResistance);
     printf("Kinetic resistance: %lf\n", generator->kineticResistance);
     printf("Thermal resistance: %lf\n", generator->thermalResistance);
+}
+
+struct List *readGeneratorList(char *file) {
+    FILE *fdGenerator;
+    fdGenerator = fopen(file, "r");
+    if (!fdGenerator) {
+        return NULL;
+    }
+
+    struct List *generatorList = newList(START_SIZE);
+    char *line = malloc(sizeof(char) * 1024);
+    size_t size = 1024;
+    while (getline(&line, &size, fdGenerator) != -1) {
+        struct ShieldGenerator *generator = generatorFromString(line);
+        add(generatorList, generator);
+    }
+    free(line);
+    return generatorList;
+}
+
+void freeGenerator(struct ShieldGenerator *generator) {
+    free(generator->experimental);
+    free(generator->engineering);
+    free(generator->type);
+    free(generator);
 }
 
